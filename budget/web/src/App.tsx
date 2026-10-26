@@ -5,6 +5,7 @@ import { ErrorBox, Loading } from './components/ui';
 import { AppProvider, useApp } from './lib/app-context';
 import { useSession } from './lib/queries';
 import { AddExpense } from './pages/AddExpense';
+import { Balance } from './pages/Balance';
 import { Categories } from './pages/Categories';
 import { Expenses } from './pages/Expenses';
 import { Home } from './pages/Home';
@@ -22,6 +23,7 @@ function Shell(): JSX.Element {
         <Route path="/" element={<Home />} />
         <Route path="/depenses" element={<Expenses />} />
         <Route path="/ajouter" element={<AddExpense />} />
+        <Route path="/solde" element={<Balance />} />
         <Route path="/plus" element={<More />} />
         <Route path="/revenus" element={<Month />} />
         <Route path="/categories" element={<Categories />} />

@@ -196,7 +196,10 @@ export interface BalanceDto {
   ratio: Record<PersonId, number>;
   monthBalance: BalanceSummary;
   overallBalance: BalanceSummary;
-  /** Amount each person actually paid / bore in the month. */
+  /** "À confirmer" expenses of the month: they are excluded from every balance until confirmed. */
+  pendingCount: number;
+  pendingCents: Cents;
+  /** Amount each person actually paid / bore in the month (confirmed expenses only). */
   monthPaid: Record<PersonId, Cents>;
   monthShare: Record<PersonId, Cents>;
   settlements: SettlementDto[];

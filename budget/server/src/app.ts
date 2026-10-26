@@ -32,9 +32,6 @@ export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Fast
     app.register(fastifyStatic, {
       root: ctx.config.webDir,
       index: false,
-      wildcard: false,
-      // index.html is served by the routes below, which inject the ingress base href
-      globIgnore: ['index.html'],
       setHeaders: (res, path) => {
         if (path.includes('/assets/')) res.header('Cache-Control', 'public, max-age=31536000, immutable');
       },
@@ -44,6 +41,7 @@ export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Fast
         .type('text/html; charset=utf-8')
         .header('Cache-Control', 'no-cache')
         .send(renderIndex(readFileSync(indexPath, 'utf8'), req.ingressPath));
+    // Explicit routes win over the static wildcard, so index.html always goes through the base-href injection.
     app.get('/', serveIndex);
     app.get('/index.html', serveIndex);
   }

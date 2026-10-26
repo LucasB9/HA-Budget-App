@@ -79,8 +79,11 @@ function summarize(
 
 export function buildBalance(db: Db, month: MonthKey): BalanceDto {
   const ids = personIds(db);
-  const monthExpenses = listExpenses(db, { month }, 100_000);
-  const allExpenses = listExpenses(db, {}, 1_000_000);
+  // Pending ("à confirmer") expenses have a guessed payer and amount: they never move a balance.
+  const monthAll = listExpenses(db, { month }, 100_000);
+  const monthExpenses = monthAll.filter((e) => e.status === 'confirmed');
+  const pending = monthAll.filter((e) => e.status === 'pending');
+  const allExpenses = listExpenses(db, { status: 'confirmed' }, 1_000_000);
   const monthSettlements = listSettlements(db, month);
   const allSettlements = listSettlements(db);
 
@@ -95,6 +98,8 @@ export function buildBalance(db: Db, month: MonthKey): BalanceDto {
   return {
     month,
     ratio: ratioFromWeights(weights, ids),
+    pendingCount: pending.length,
+    pendingCents: pending.reduce((sum, e) => sum + e.amountCents, 0),
     monthBalance: summarize(ids, monthExpenses, monthSettlements),
     overallBalance: summarize(ids, allExpenses, allSettlements),
     monthPaid,

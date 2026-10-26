@@ -413,9 +413,31 @@ describe('income ratio frozen per month', () => {
   });
 });
 
+/** Confirms every pending fixed expense, as the household would do during the month. */
+async function confirmAllPending(env: TestEnv): Promise<void> {
+  const pending = (await api<ExpenseDto[]>(env, 'GET', '/api/expenses?status=pending')).body;
+  for (const e of pending) await api(env, 'POST', `/api/expenses/${e.id}/confirm`, {});
+}
+
 describe('balance and settlements', () => {
+  it('leaves pending expenses out of the balance and reports them separately', async () => {
+    const env = await setup();
+    const b = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
+    expect(b.monthBalance.debt).toBeNull();
+    expect(b.overallBalance.debt).toBeNull();
+    expect(b.pendingCount).toBe(5);
+    expect(b.pendingCents).toBe(100000 + 5000 + 10000 + 2000 + 1000);
+    expect(b.monthPaid.p1).toBe(0);
+
+    await confirmAllPending(env);
+    const after = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
+    expect(after.pendingCount).toBe(0);
+    expect(after.monthBalance.debt).toEqual({ debtorId: 'p2', creditorId: 'p1', amountCents: 27000 });
+  });
+
   it('shows who owes whom for the month and overall', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     await spend(env, 'Courses', 10000, '2026-10-15', { splitMode: 'equal' });
     const b = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
     // the pending fixed expenses (paid by p1, split on income) add to what p2 owes: 5000 + 27000
@@ -426,6 +448,7 @@ describe('balance and settlements', () => {
 
   it('ignores personal expenses paid by the person who bears them', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     await spend(env, 'Courses', 5000, '2026-10-15', { splitMode: 'single', singleId: 'p1' });
     const without = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
     expect(without.monthBalance.debt?.amountCents).toBe(27000);
@@ -433,6 +456,7 @@ describe('balance and settlements', () => {
 
   it('charges the other person when one pays for the other', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     await spend(env, 'Courses', 5000, '2026-10-15', { splitMode: 'single', singleId: 'p2' });
     const b = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
     expect(b.monthBalance.debt?.amountCents).toBe(32000);
@@ -440,6 +464,7 @@ describe('balance and settlements', () => {
 
   it('records a reimbursement and keeps a history', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     const before = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
     const owed = before.overallBalance.debt?.amountCents ?? 0;
 
@@ -457,6 +482,7 @@ describe('balance and settlements', () => {
 
   it('flips the debt when someone over-reimburses', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     const owed = ((await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body.overallBalance.debt?.amountCents ?? 0);
     await api(env, 'POST', '/api/settlements', { date: '2026-10-20', fromId: 'p2', toId: 'p1', amountCents: owed + 500 });
     const b = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
@@ -465,6 +491,7 @@ describe('balance and settlements', () => {
 
   it('cancels a reimbursement', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     const s = (await api<SettlementDto>(env, 'POST', '/api/settlements', { date: '2026-10-20', fromId: 'p2', toId: 'p1', amountCents: 10000 })).body;
     expect((await api(env, 'DELETE', `/api/settlements/${s.id}`)).status).toBe(204);
     expect((await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body.settlements).toHaveLength(0);
@@ -473,6 +500,7 @@ describe('balance and settlements', () => {
 
   it('separates the month balance from the overall one', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     await spend(env, 'Courses', 10000, '2026-09-10', { splitMode: 'equal' });
     const b = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
     expect(b.monthBalance.debt?.amountCents).toBe(27000);
@@ -481,6 +509,7 @@ describe('balance and settlements', () => {
 
   it('reports what each person paid and bears in the month', async () => {
     const env = await setup();
+    await confirmAllPending(env);
     await spend(env, 'Courses', 10000, '2026-10-15', { splitMode: 'equal' });
     const b = (await api<BalanceDto>(env, 'GET', '/api/balance?month=2026-10')).body;
     // fixed expenses (1000 + 50 + 100 + 20 + 10 euros, all paid by p1) plus the new 100 euros
