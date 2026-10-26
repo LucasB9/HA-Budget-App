@@ -2,7 +2,7 @@ name: Household Budget
 version: "0.1.0"
 slug: household_budget
 description: Budget de foyer partagé (dépenses à la Tricount, épargne, récap IA mensuel)
-url: https://github.com/CHANGE-ME/HA-Budget-App
+url: https://github.com/LucasB9/HA-Budget-App
 arch:
   - aarch64
   - amd64
