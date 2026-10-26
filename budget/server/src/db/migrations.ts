@@ -58,7 +58,10 @@ export const migrations: readonly Migration[] = [
 
       CREATE TABLE months (
         month TEXT PRIMARY KEY,
-        created_at TEXT NOT NULL
+        created_at TEXT NOT NULL,
+        -- 1 when fixed expenses are generated for this month. Months created implicitly by a
+        -- back-dated expense stay at 0 so they are not filled with "à confirmer" entries.
+        fixed_enabled INTEGER NOT NULL DEFAULT 0
       );
 
       CREATE TABLE month_incomes (

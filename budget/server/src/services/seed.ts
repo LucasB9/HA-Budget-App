@@ -79,7 +79,7 @@ export function importSeed(ctx: AppContext, seed: Seed): SeedResult {
     seed.people.forEach((p, i) => {
       incomes[`p${i + 1}`] = eurosToCents(p.monthlyIncome);
     });
-    ensureMonth(db, thisMonth(ctx), { incomes });
+    ensureMonth(db, thisMonth(ctx), { incomes, withFixed: true });
 
     const insertAccount = db.prepare(
       'INSERT INTO savings_accounts (id, name, kind, goal_cents, goal_date, position) VALUES (?, ?, ?, ?, ?, ?)',

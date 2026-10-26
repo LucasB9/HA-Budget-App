@@ -28,7 +28,7 @@ export function monthRoutes(app: FastifyInstance, ctx: AppContext): void {
 
   app.post<{ Params: { month: string } }>('/api/months/:month', async (req, reply) => {
     const month = monthParam(req);
-    const created = ensureMonth(db, month);
+    const created = ensureMonth(db, month, { withFixed: true });
     generateFixedExpenses(ctx);
     return reply.status(created ? 201 : 200).send({ month, created });
   });

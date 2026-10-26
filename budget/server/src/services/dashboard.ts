@@ -116,6 +116,7 @@ export function buildDashboard(ctx: AppContext, month: MonthKey): DashboardDto {
       }));
       const carryIn = carryAfter(history, mode);
       const env = computeEnvelope({
+        kind: cat.kind,
         planned: monthPlanned,
         transfersIn: monthIn,
         transfersOut: monthOut,

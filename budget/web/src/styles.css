@@ -232,6 +232,14 @@ a {
   white-space: nowrap;
 }
 
+.row-title-wrap {
+  font-weight: 500;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+
 .row-sub {
   font-size: 13px;
   color: var(--muted);
@@ -565,7 +573,7 @@ a {
   margin: 0 auto;
   height: var(--tabbar-h);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(var(--tabs, 4), 1fr);
   align-items: center;
 }
 .tab {

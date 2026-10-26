@@ -148,6 +148,11 @@ function sameRatio(a: Record<string, number>, b: Record<string, number>): boolea
   return ids.every((id) => (a[id] ?? 0) * tb === (b[id] ?? 0) * ta);
 }
 
+/** Turns on fixed-expense generation for a month (explicit creation or the current month). */
+export function enableFixed(db: Db, month: MonthKey): void {
+  db.prepare('UPDATE months SET fixed_enabled = 1 WHERE month = ?').run(month);
+}
+
 /**
  * Creates a month by copying the previous one (or the template when there is none).
  * Incomes are copied, the income ratio is frozen from them. Returns true when created.
@@ -155,15 +160,18 @@ function sameRatio(a: Record<string, number>, b: Record<string, number>): boolea
 export function ensureMonth(
   db: Db,
   month: MonthKey,
-  opts: { incomes?: Record<string, Cents> } = {},
+  opts: { incomes?: Record<string, Cents>; withFixed?: boolean } = {},
 ): boolean {
-  if (monthExists(db, month)) return false;
+  if (monthExists(db, month)) {
+    if (opts.withFixed) enableFixed(db, month);
+    return false;
+  }
   const ids = personIds(db);
   if (ids.length === 0) throw notFound('No household configured yet', 'setup_required');
 
   db.transaction(() => {
     const prev = previousMonth(db, month);
-    db.prepare('INSERT INTO months (month, created_at) VALUES (?, ?)').run(month, nowIso());
+    db.prepare('INSERT INTO months (month, created_at, fixed_enabled) VALUES (?, ?, ?)').run(month, nowIso(), opts.withFixed ? 1 : 0);
 
     const incomes: Record<string, Cents> = {};
     const prevIncomes = prev ? getIncomes(db, prev) : [];

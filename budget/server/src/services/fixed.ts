@@ -32,7 +32,8 @@ export function generateFixedExpenses(ctx: AppContext): number {
       `SELECT l.month, l.category_id, l.subcategory_id, l.planned_cents, c.fixed_day, c.default_payer_id, c.default_split
        FROM budget_lines l
        JOIN categories c ON c.id = l.category_id
-       WHERE c.kind = 'fixed' AND c.archived = 0 AND l.planned_cents > 0 AND l.month <= ?
+       JOIN months m ON m.month = l.month
+       WHERE m.fixed_enabled = 1 AND c.kind = 'fixed' AND c.archived = 0 AND l.planned_cents > 0 AND l.month <= ?
        ORDER BY l.month, c.position`,
     )
     .all(current) as FixedLine[];
@@ -81,7 +82,7 @@ export function runDailyTasks(ctx: AppContext): { monthCreated: boolean; fixedCr
   if (listPeople(ctx.db).length === 0) return { monthCreated: false, fixedCreated: 0 };
   ensureSystemCategory(ctx.db);
   const month: MonthKey = thisMonth(ctx);
-  const monthCreated = ensureMonth(ctx.db, month);
+  const monthCreated = ensureMonth(ctx.db, month, { withFixed: true });
   const fixedCreated = generateFixedExpenses(ctx);
   return { monthCreated, fixedCreated };
 }

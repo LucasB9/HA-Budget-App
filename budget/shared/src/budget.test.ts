@@ -25,6 +25,14 @@ describe('computeEnvelope', () => {
     expect(statusFor(1.4, 140)).toBe('over');
   });
 
+  it('does not alert fixed or provision envelopes that are used up exactly', () => {
+    expect(statusFor(1, 100, 'fixed')).toBe('ok');
+    expect(statusFor(0.9, 90, 'provision')).toBe('ok');
+    expect(statusFor(1.01, 101, 'fixed')).toBe('over');
+    const r = computeEnvelope({ kind: 'fixed', planned: 90000, transfersIn: 0, transfersOut: 0, spent: 90000, carryIn: 0 });
+    expect(r.status).toBe('ok');
+  });
+
   it('keeps ratio finite when the budget is zero', () => {
     const r = computeEnvelope({ planned: 0, transfersIn: 0, transfersOut: 0, spent: 500, carryIn: 0 });
     expect(Number.isFinite(r.ratio)).toBe(true);

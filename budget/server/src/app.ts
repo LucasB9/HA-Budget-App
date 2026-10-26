@@ -29,7 +29,6 @@ export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Fast
 
   const indexPath = join(ctx.config.webDir, 'index.html');
   if (existsSync(indexPath)) {
-    const indexHtml = readFileSync(indexPath, 'utf8');
     app.register(fastifyStatic, {
       root: ctx.config.webDir,
       index: false,
@@ -44,7 +43,7 @@ export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Fast
       reply
         .type('text/html; charset=utf-8')
         .header('Cache-Control', 'no-cache')
-        .send(renderIndex(indexHtml, req.ingressPath));
+        .send(renderIndex(readFileSync(indexPath, 'utf8'), req.ingressPath));
     app.get('/', serveIndex);
     app.get('/index.html', serveIndex);
   }
