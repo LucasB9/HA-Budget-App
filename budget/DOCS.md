@@ -71,10 +71,24 @@ Dans **Réglages**, vous pouvez activer la génération automatique du récap du
 
 L'app publie ces capteurs pour vos tableaux de bord et notifications (mis à jour après chaque modification et chaque heure) :
 
-`sensor.budget_remaining`, `sensor.budget_spent`, `sensor.budget_balance_owed` (attributs `debtor`, `creditor`, `summary`),
-`sensor.budget_savings_rate`, `sensor.budget_pending_expenses`.
+| Capteur | Contenu |
+|---|---|
+| `sensor.budget_remaining` | reste à dépenser ce mois-ci (€) |
+| `sensor.budget_spent` | dépensé ce mois-ci (€) |
+| `sensor.budget_spent_percent` | part du budget consommée (%) |
+| `sensor.budget_projected` | projection de fin de mois (€) |
+| `sensor.budget_balance_owed` | montant à rembourser entre vous (attributs `debtor`, `creditor`, `summary`) |
+| `sensor.budget_pending_expenses` | nombre de dépenses fixes à confirmer |
+| `sensor.budget_over_budget_categories` | nombre de catégories dépassées (attribut `categories`) |
+| `sensor.budget_savings_rate` | taux d'épargne du mois (%) |
 
 Ces états ne survivent pas à un redémarrage de Home Assistant : ils réapparaissent à la prochaine mise à jour de l'app.
+
+### Carte « vue d'ensemble » pour un dashboard
+
+Le fichier [`dashboard-card.yaml`](dashboard-card.yaml) contient une carte prête à l'emploi (jauge du budget consommé, reste à dépenser,
+projection, solde entre vous, dépenses à confirmer, taux d'épargne, et une alerte quand une catégorie dépasse son budget).
+Elle n'utilise que des cartes intégrées. Dans un dashboard : **⋮ → Modifier → Ajouter une carte → Manuel**, puis collez son contenu.
 
 ## Raccourci iOS (ajout rapide)
 

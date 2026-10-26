@@ -47,10 +47,13 @@ describe('Home Assistant sensors', () => {
 
     expect(ha.calls.map((c) => c.entityId).sort()).toEqual([
       'sensor.budget_balance_owed',
+      'sensor.budget_over_budget_categories',
       'sensor.budget_pending_expenses',
+      'sensor.budget_projected',
       'sensor.budget_remaining',
       'sensor.budget_savings_rate',
       'sensor.budget_spent',
+      'sensor.budget_spent_percent',
     ]);
     // planned 2410 euros, spent: 5 fixed (1000 + 50 + 100 + 20 + 10) + 100 = 1280
     expect(latest(ha, 'sensor.budget_spent')?.state).toBe(1280);
@@ -60,6 +63,23 @@ describe('Home Assistant sensors', () => {
     expect(owed).toMatchObject({ state: 320, attributes: { debtor: 'Sam', creditor: 'Alex' } });
     expect(plain(owed?.attributes.summary)).toBe('Sam doit 320,00 € à Alex');
     expect(latest(ha, 'sensor.budget_savings_rate')?.state).toBe(0);
+    // 1280 spent of a 2410 budget
+    expect(latest(ha, 'sensor.budget_spent_percent')?.state).toBe(53.1);
+    expect(latest(ha, 'sensor.budget_over_budget_categories')).toMatchObject({ state: 0, attributes: { categories: [] } });
+  });
+
+  it('lists the categories that went over budget, but not Imprévus', async () => {
+    const env = await setup();
+    const food = await categoryByName(env, 'Courses');
+    const imprevus = (await api<{ categories: { id: string; isSystem: boolean }[] }[]>(env, 'GET', '/api/catalog')).body.flatMap((g) => g.categories).find((c) => c.isSystem);
+    await api(env, 'POST', '/api/expenses', expenseBody({ categoryId: food.id, payerId: 'p1', amountCents: 45000 }));
+    await api(env, 'POST', '/api/expenses', expenseBody({ categoryId: imprevus?.id ?? '', payerId: 'p1', amountCents: 2000 }));
+    const ha = fakeHa();
+    await createHaPublisher(env.ctx, ha).publishNow();
+    expect(latest(ha, 'sensor.budget_over_budget_categories')).toMatchObject({
+      state: 1,
+      attributes: { categories: ['Courses'], imprevus_to_reclassify: 1 },
+    });
   });
 
   it('reports a settled balance', async () => {
@@ -94,7 +114,7 @@ describe('Home Assistant sensors', () => {
     publisher.schedule();
     expect(ha.calls).toHaveLength(0);
     await sleep(80);
-    expect(ha.calls).toHaveLength(5);
+    expect(ha.calls).toHaveLength(8);
   });
 
   it('republishes after a successful change, but not after a read or a failed change', async () => {

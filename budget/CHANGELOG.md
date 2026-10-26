@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- New Home Assistant sensors: budget consumed (%), end-of-month projection, categories over budget.
+- `dashboard-card.yaml`: ready-made overview card for a Home Assistant dashboard.
+
 ## 0.1.0
 
 First release.

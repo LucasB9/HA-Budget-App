@@ -53,6 +53,10 @@ export function createHaPublisher(
       const balance = buildBalance(ctx.db, month);
       const names = new Map(listPeople(ctx.db).map((p) => [p.id, p.name]));
       const debt = balance.overallBalance.debt;
+      const categories = dash.groups.flatMap((g) => g.categories);
+      // Imprévus has no budget by design, so it would always look "over": it is reported on its own.
+      const over = categories.filter((c) => c.status === 'over' && !c.isSystem);
+      const spentPercent = dash.totals.effective > 0 ? Math.round((dash.totals.spent / dash.totals.effective) * 1000) / 10 : 0;
       const base = { month, icon: 'mdi:wallet' };
 
       await Promise.all([
@@ -82,6 +86,27 @@ export function createHaPublisher(
           summary: debt
             ? `${names.get(debt.debtorId)} doit ${formatEur(debt.amountCents)} à ${names.get(debt.creditorId)}`
             : 'À jour',
+        }),
+        client.setState('sensor.budget_spent_percent', spentPercent, {
+          ...base,
+          friendly_name: 'Budget consommé',
+          unit_of_measurement: '%',
+          icon: 'mdi:gauge',
+        }),
+        client.setState('sensor.budget_projected', eur(dash.totals.projected), {
+          ...base,
+          friendly_name: 'Projection de fin de mois',
+          unit_of_measurement: '€',
+          device_class: 'monetary',
+          icon: 'mdi:chart-line',
+          budget: eur(dash.totals.effective),
+        }),
+        client.setState('sensor.budget_over_budget_categories', over.length, {
+          ...base,
+          friendly_name: 'Catégories dépassées',
+          icon: 'mdi:alert-circle-outline',
+          categories: over.map((c) => c.name),
+          imprevus_to_reclassify: dash.imprevusCount,
         }),
         client.setState('sensor.budget_savings_rate', dash.totals.savingsRate === null ? 'unknown' : Math.round(dash.totals.savingsRate * 1000) / 10, {
           ...base,

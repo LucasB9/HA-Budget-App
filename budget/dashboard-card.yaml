@@ -1,0 +1,49 @@
+# Carte « vue d'ensemble » pour un dashboard Home Assistant.
+# Utilise uniquement des cartes intégrées et les capteurs publiés par l'app Budget.
+#
+# Dans le dashboard : ⋮ → Modifier → Ajouter une carte → Manuel, puis collez ce contenu.
+type: vertical-stack
+cards:
+  - type: gauge
+    entity: sensor.budget_spent_percent
+    name: Budget consommé ce mois-ci
+    unit: "%"
+    min: 0
+    max: 100
+    severity:
+      green: 0
+      yellow: 80
+      red: 100
+
+  - type: entities
+    title: Budget du mois
+    show_header_toggle: false
+    entities:
+      - entity: sensor.budget_remaining
+        name: Reste à dépenser
+        icon: mdi:wallet
+      - entity: sensor.budget_projected
+        name: Projection de fin de mois
+      - entity: sensor.budget_balance_owed
+        name: Solde à rembourser
+      - type: attribute
+        entity: sensor.budget_balance_owed
+        attribute: summary
+        name: Entre vous deux
+        icon: mdi:account-switch
+      - entity: sensor.budget_pending_expenses
+        name: Dépenses fixes à confirmer
+      - entity: sensor.budget_savings_rate
+        name: Taux d'épargne du mois
+
+  # Affichée seulement quand au moins une catégorie dépasse son budget.
+  - type: conditional
+    conditions:
+      - condition: numeric_state
+        entity: sensor.budget_over_budget_categories
+        above: 0
+    card:
+      type: markdown
+      content: >-
+        ⚠️ **Au-dessus du budget :**
+        {{ state_attr('sensor.budget_over_budget_categories', 'categories') | join(', ') }}
