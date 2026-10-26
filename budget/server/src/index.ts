@@ -1,14 +1,21 @@
+import { createAnthropicClient } from './ai/client.js';
 import { buildApp } from './app.js';
 import { loadConfig } from './config.js';
 import type { AppContext } from './context.js';
 import { openDatabase } from './db/connection.js';
 import { runDailyTasks } from './services/fixed.js';
+import { runAutoRecap } from './services/recap.js';
 
 const HOUR_MS = 60 * 60 * 1000;
 
 async function main(): Promise<void> {
   const config = loadConfig();
-  const ctx: AppContext = { db: openDatabase(config.dbPath), config, now: () => new Date() };
+  const ctx: AppContext = {
+    db: openDatabase(config.dbPath),
+    config,
+    ai: config.anthropicApiKey ? createAnthropicClient(config.anthropicApiKey) : null,
+    now: () => new Date(),
+  };
   const app = buildApp(ctx, { logger: true });
 
   const housekeeping = (): void => {
@@ -18,6 +25,11 @@ async function main(): Promise<void> {
     } catch (err) {
       app.log.error({ err }, 'daily tasks failed');
     }
+    runAutoRecap(ctx)
+      .then((recap) => {
+        if (recap) app.log.info({ month: recap.month }, 'monthly recap generated');
+      })
+      .catch((err: unknown) => app.log.warn({ err }, 'automatic recap failed'));
   };
   housekeeping();
   const timer = setInterval(housekeeping, HOUR_MS);

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 const ITEMS: { to: string; title: string; sub: string }[] = [
   { to: '/epargne', title: 'Épargne', sub: 'Comptes, versements du mois, graphiques, objectifs' },
+  { to: '/recap', title: 'Récap IA', sub: 'Analyse du mois en français, historique des récaps' },
   { to: '/revenus', title: 'Revenus & virements', sub: 'Revenus du mois, ratio de répartition, virements entre enveloppes' },
   { to: '/categories', title: 'Catégories', sub: 'Groupes, sous-lignes, report, archivage, fusion' },
   { to: '/tags', title: 'Par tag', sub: 'Totaux par tag, toutes catégories et tous mois' },

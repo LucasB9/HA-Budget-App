@@ -32,6 +32,7 @@ export function actorOf(req: FastifyRequest): string | null {
 export function registerErrorHandler(app: FastifyInstance): void {
   app.setErrorHandler((err: unknown, req, reply) => {
     if (err instanceof HttpError) {
+      if (err.status >= 500) req.log.error({ err }, err.message);
       const body: ApiError = { error: err.code, message: err.message };
       return reply.status(err.status).send(body);
     }

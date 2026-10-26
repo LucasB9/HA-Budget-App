@@ -17,7 +17,8 @@ export interface AppConfig {
   version: string;
 }
 
-export const DEFAULT_MODEL = 'claude-sonnet-5-5';
+/** Strong default for a once-a-month analysis; a recap costs a few cents. `claude-sonnet-5-5` is the cheaper alternative. */
+export const DEFAULT_MODEL = 'claude-opus-5-5';
 export const INGRESS_GATEWAY_IP = '172.30.32.2';
 
 interface HaOptions {

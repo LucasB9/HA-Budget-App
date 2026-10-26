@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FastifyInstance } from 'fastify';
 import type { CategoryDto, ExpenseInput, GroupDto } from '@budget/shared';
+import type { AiClient } from './ai/client.js';
 import { buildApp } from './app.js';
 import type { AppConfig } from './config.js';
 import type { AppContext } from './context.js';
@@ -20,7 +21,7 @@ export interface TestEnv {
   setNow: (iso: string) => void;
 }
 
-export function createTestEnv(opts: { now?: string; config?: Partial<AppConfig> } = {}): TestEnv {
+export function createTestEnv(opts: { now?: string; config?: Partial<AppConfig>; ai?: AiClient | null } = {}): TestEnv {
   let now = new Date(opts.now ?? '2026-10-15T10:00:00Z');
   const config: AppConfig = {
     port: 0,
@@ -36,7 +37,7 @@ export function createTestEnv(opts: { now?: string; config?: Partial<AppConfig> 
     version: 'test',
     ...opts.config,
   };
-  const ctx: AppContext = { db: openDatabase(':memory:'), config, now: () => now };
+  const ctx: AppContext = { db: openDatabase(':memory:'), config, ai: opts.ai ?? null, now: () => now };
   return { app: buildApp(ctx), ctx, setNow: (iso) => (now = new Date(iso)) };
 }
 

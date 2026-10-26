@@ -286,3 +286,17 @@ export interface SavingsOverviewDto {
   monthStats: SavingsMonthStat[];
   goal: SavingsGoalDto | null;
 }
+
+// ---------------------------------------------------------------- recap
+
+export interface RecapDto {
+  id: string;
+  month: string;
+  createdAt: string;
+  model: string;
+  trigger: 'manual' | 'auto';
+  /** Markdown, in French. */
+  content: string;
+  inputTokens: number | null;
+  outputTokens: number | null;
+}

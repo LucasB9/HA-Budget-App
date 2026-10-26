@@ -12,7 +12,7 @@ await build({
   platform: 'node',
   target: 'node22',
   format: 'esm',
-  sourcemap: true,
+  sourcemap: false,
   external: ['better-sqlite3'],
   banner: {
     js: "import { createRequire as __createRequire } from 'node:module'; const require = __createRequire(import.meta.url);",

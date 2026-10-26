@@ -60,6 +60,26 @@ export function Settings(): JSX.Element {
       </div>
 
       <div className="card stack">
+        <span className="card-title">Récap IA</span>
+        {session.aiConfigured ? (
+          <p className="muted small">Clé API Anthropic configurée dans les options de l'app Home Assistant.</p>
+        ) : (
+          <p className="muted small">
+            Aucune clé API configurée : ajoutez « anthropic_api_key » dans Paramètres › Apps › Budget › Configuration.
+          </p>
+        )}
+        <label className="hstack">
+          <input
+            type="checkbox"
+            disabled={!session.aiConfigured || patchSettings.isPending}
+            checked={session.settings.autoRecap}
+            onChange={(e) => patchSettings.mutate({ autoRecap: e.target.checked })}
+          />
+          <span>Générer automatiquement le récap le 1er de chaque mois</span>
+        </label>
+      </div>
+
+      <div className="card stack">
         <span className="card-title">Qui es-tu ?</span>
         {session.me ? (
           <p className="muted">Reconnu via Home Assistant : {me?.name}.</p>
