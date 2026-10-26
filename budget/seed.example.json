@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "people": [
+    {
+      "name": "Alex",
+      "monthlyIncome": 3000
+    },
+    {
+      "name": "Sam",
+      "monthlyIncome": 1000
+    }
+  ],
+  "defaultSplitMode": "income",
+  "groups": [
+    {
+      "name": "Logement",
+      "categories": [
+        {
+          "name": "Loyer",
+          "amount": 1000,
+          "type": "fixed"
+        },
+        {
+          "name": "Électricité",
+          "amount": 50,
+          "type": "fixed"
+        },
+        {
+          "name": "Chauffage",
+          "amount": 100,
+          "type": "variable"
+        }
+      ]
+    },
+    {
+      "name": "Alimentation",
+      "categories": [
+        {
+          "name": "Courses",
+          "amount": 400,
+          "type": "variable"
+        },
+        {
+          "name": "Restaurant",
+          "amount": 100,
+          "type": "variable"
+        }
+      ]
+    },
+    {
+      "name": "Transport",
+      "categories": [
+        {
+          "name": "Essence",
+          "amount": 100,
+          "type": "variable"
+        },
+        {
+          "name": "Entretien",
+          "amount": 50,
+          "type": "variable",
+          "rollover": true
+        }
+      ]
+    },
+    {
+      "name": "Santé et assurances",
+      "categories": [
+        {
+          "name": "Mutuelle Alex",
+          "amount": 100,
+          "type": "fixed",
+          "payer": "Alex",
+          "split": "personal"
+        }
+      ]
+    },
+    {
+      "name": "Animaux",
+      "categories": [
+        {
+          "name": "Animaux",
+          "amount": 100,
+          "type": "variable",
+          "sublines": [
+            {
+              "name": "Croquettes",
+              "amount": 40
+            },
+            {
+              "name": "Vétérinaire",
+              "amount": 60
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Abonnements",
+      "categories": [
+        {
+          "name": "Streaming",
+          "amount": 20,
+          "type": "fixed"
+        },
+        {
+          "name": "Cloud",
+          "amount": 10,
+          "type": "fixed"
+        }
+      ]
+    },
+    {
+      "name": "Plaisir",
+      "categories": [
+        {
+          "name": "Loisirs",
+          "amount": 200,
+          "type": "variable"
+        },
+        {
+          "name": "Vêtements",
+          "amount": 100,
+          "type": "variable",
+          "rollover": true
+        }
+      ]
+    },
+    {
+      "name": "Provisions",
+      "categories": [
+        {
+          "name": "Noël",
+          "amount": 50,
+          "type": "provision"
+        },
+        {
+          "name": "Anniversaire",
+          "amount": 30,
+          "type": "provision"
+        }
+      ]
+    }
+  ],
+  "savingsAccounts": [
+    {
+      "name": "Livret A",
+      "kind": "Livret",
+      "goalAmount": 5000
+    },
+    {
+      "name": "PEA",
+      "kind": "PEA"
+    }
+  ]
+}

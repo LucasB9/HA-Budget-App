@@ -1,0 +1,36 @@
+{
+  "name": "household-budget",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "server",
+    "web"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w server\" \"npm run dev -w web\"",
+    "dev:ingress": "concurrently -n api,web,proxy -c blue,green,magenta \"npm run dev -w server\" \"npm run build:watch -w web\" \"node scripts/dev-ingress-proxy.mjs\"",
+    "build": "npm run build -w web && npm run build -w server",
+    "start": "node server/dist/server.js",
+    "test": "vitest run",
+    "typecheck": "tsc -b shared server web"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.5",
+    "concurrently": "^10.0.6",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true,
+    "esbuild@0.28.2": true,
+    "fsevents": false
+  }
+}

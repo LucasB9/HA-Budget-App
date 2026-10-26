@@ -1,0 +1,16 @@
+{
+  "name": "@budget/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "WEB_DIR=../web/dist SEED_EXAMPLE_PATH=../seed.example.json DATA_DIR=../.data tsx watch --clear-screen=false src/index.ts",
+    "build": "node ../scripts/build-server.mjs"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.7",
+    "better-sqlite3": "^13.0.3",
+    "fastify": "^5.12.7",
+    "zod": "^4.6.7"
+  }
+}
