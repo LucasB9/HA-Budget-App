@@ -218,3 +218,71 @@ export interface ApiError {
   message: string;
   issues?: unknown;
 }
+
+// ---------------------------------------------------------------- savings
+
+export interface SavingsAccountDto {
+  id: string;
+  name: string;
+  kind: string;
+  goalCents: Cents | null;
+  goalDate: string | null;
+  archived: boolean;
+  position: number;
+  /** Sum of every monthly contribution (withdrawals are negative). */
+  contributionsCents: Cents;
+  latestBalanceCents: Cents | null;
+  latestBalanceMonth: string | null;
+  /** Latest known balance, else cumulative contributions. */
+  currentCents: Cents;
+  /** currentCents / goalCents, or null without a goal. */
+  progress: number | null;
+}
+
+export interface SavingsEntryDto {
+  accountId: string;
+  month: string;
+  contributionCents: Cents;
+  balanceCents: Cents | null;
+  note: string;
+}
+
+export interface SavingsSeriesPoint {
+  month: string;
+  /** Contributions of that month, all accounts. */
+  contributionCents: Cents;
+  /** Cumulative contributions, all accounts. */
+  cumulativeCents: Cents;
+  /** Cumulative contributions per account id. */
+  perAccount: Record<string, Cents>;
+  /**
+   * Total value: last known balance per account (carried forward), or cumulative contributions for
+   * an account without snapshot. Null until a first snapshot exists.
+   */
+  balanceCents: Cents | null;
+}
+
+export interface SavingsMonthStat {
+  month: string;
+  incomeCents: Cents;
+  /** income - planned expenses: what the budget meant to set aside. Null if the month has no budget. */
+  plannedCents: Cents | null;
+  contributionCents: Cents;
+  /** contributions / income. */
+  rate: number | null;
+}
+
+export interface SavingsGoalDto {
+  targetCents: Cents;
+  date: string | null;
+  currentCents: Cents;
+  progress: number;
+}
+
+export interface SavingsOverviewDto {
+  accounts: SavingsAccountDto[];
+  entries: SavingsEntryDto[];
+  series: SavingsSeriesPoint[];
+  monthStats: SavingsMonthStat[];
+  goal: SavingsGoalDto | null;
+}

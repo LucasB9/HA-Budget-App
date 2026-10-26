@@ -11,6 +11,7 @@ import { Expenses } from './pages/Expenses';
 import { Home } from './pages/Home';
 import { Month } from './pages/Month';
 import { More } from './pages/More';
+import { Savings } from './pages/Savings';
 import { Settings } from './pages/Settings';
 import { Setup } from './pages/Setup';
 import { Tags } from './pages/Tags';
@@ -24,6 +25,7 @@ function Shell(): JSX.Element {
         <Route path="/depenses" element={<Expenses />} />
         <Route path="/ajouter" element={<AddExpense />} />
         <Route path="/solde" element={<Balance />} />
+        <Route path="/epargne" element={<Savings />} />
         <Route path="/plus" element={<More />} />
         <Route path="/revenus" element={<Month />} />
         <Route path="/categories" element={<Categories />} />

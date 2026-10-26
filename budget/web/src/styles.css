@@ -14,6 +14,11 @@
   --warn-soft: rgba(255, 159, 10, 0.16);
   --bad: #e5483d;
   --bad-soft: rgba(229, 72, 61, 0.13);
+  --c1: var(--accent);
+  --c2: #e08a00;
+  --c3: #30a853;
+  --c4: #af52de;
+  --c5: #e5483d;
   --radius: 16px;
   --radius-sm: 10px;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
@@ -38,6 +43,10 @@
     --warn-soft: rgba(255, 179, 64, 0.16);
     --bad: #ff6a5f;
     --bad-soft: rgba(255, 106, 95, 0.16);
+    --c2: #ffb340;
+    --c3: #4cd070;
+    --c4: #c07bf0;
+    --c5: #ff6a5f;
     --shadow: none;
   }
 }
@@ -710,4 +719,32 @@ a {
 
 input[type='file'] {
   width: 100%;
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.chart text {
+  fill: var(--muted);
+  font-size: 10px;
+}
+.chart .grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
 }

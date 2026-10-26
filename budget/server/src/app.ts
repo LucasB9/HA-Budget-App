@@ -9,6 +9,7 @@ import { catalogRoutes } from './routes/catalog.js';
 import { coreRoutes } from './routes/core.js';
 import { expenseRoutes } from './routes/expenses.js';
 import { monthRoutes } from './routes/months.js';
+import { savingsRoutes } from './routes/savings.js';
 
 /** Injects `<base href>` so relative asset URLs resolve under the ingress prefix, even without a trailing slash. */
 function renderIndex(html: string, ingressPath: string | null): string {
@@ -26,6 +27,7 @@ export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Fast
   catalogRoutes(app, ctx);
   monthRoutes(app, ctx);
   expenseRoutes(app, ctx);
+  savingsRoutes(app, ctx);
 
   const indexPath = join(ctx.config.webDir, 'index.html');
   if (existsSync(indexPath)) {

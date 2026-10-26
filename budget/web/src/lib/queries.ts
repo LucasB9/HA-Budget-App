@@ -11,6 +11,7 @@ import type {
   ExpenseDto,
   GroupDto,
   MonthDto,
+  SavingsOverviewDto,
   SessionDto,
   TagSummaryRow,
   TransferDto,
@@ -68,6 +69,10 @@ export function useTags(): UseQueryResult<{ name: string; count: number }[]> {
 
 export function useTagSummary(): UseQueryResult<TagSummaryRow[]> {
   return useQuery({ queryKey: ['tag-summary'], queryFn: () => api.get<TagSummaryRow[]>('/tags/summary') });
+}
+
+export function useSavings(): UseQueryResult<SavingsOverviewDto> {
+  return useQuery({ queryKey: ['savings'], queryFn: () => api.get<SavingsOverviewDto>('/savings') });
 }
 
 export function useTransfers(month: string): UseQueryResult<TransferDto[]> {
