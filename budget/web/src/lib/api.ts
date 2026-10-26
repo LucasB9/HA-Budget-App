@@ -1,6 +1,11 @@
 // All API URLs are relative to the page so the app works under the Home Assistant Ingress prefix.
 const API_BASE = new URL('api/', document.baseURI).toString();
 
+/** Absolute URL of an API path, for plain links such as downloads. Stays under the Ingress prefix. */
+export function apiUrl(path: string): string {
+  return new URL(path.replace(/^\//, ''), API_BASE).toString();
+}
+
 export const ME_STORAGE_KEY = 'budget.me';
 
 export class ApiError extends Error {
@@ -49,6 +54,21 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   if (res.status === 204) return undefined as T;
   const text = await res.text();
   const data: unknown = text ? JSON.parse(text) : undefined;
+  if (!res.ok) {
+    const err = (data ?? {}) as { error?: string; message?: string };
+    throw new ApiError(res.status, err.error ?? 'error', err.message ?? `Erreur ${res.status}`);
+  }
+  return data as T;
+}
+
+/** Sends a raw text body (CSV). */
+export async function postText<T>(path: string, text: string, contentType = 'text/csv'): Promise<T> {
+  const headers: Record<string, string> = { 'Content-Type': contentType };
+  const me = readStoredPerson();
+  if (me) headers['X-Budget-Person'] = me;
+  const res = await fetch(new URL(path.replace(/^\//, ''), API_BASE), { method: 'POST', headers, body: text });
+  const raw = await res.text();
+  const data: unknown = raw ? JSON.parse(raw) : undefined;
   if (!res.ok) {
     const err = (data ?? {}) as { error?: string; message?: string };
     throw new ApiError(res.status, err.error ?? 'error', err.message ?? `Erreur ${res.status}`);

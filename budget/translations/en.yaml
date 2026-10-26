@@ -1,0 +1,17 @@
+configuration:
+  anthropic_api_key:
+    name: Anthropic API key
+    description: >-
+      Only used for the AI monthly recap. Stored in the app configuration, never in the GitHub repository.
+      Leave empty to disable the recap.
+  anthropic_model:
+    name: Anthropic model
+    description: >-
+      Model used for the recap. Defaults to claude-opus-5-5; claude-sonnet-5-5 is cheaper.
+  shortcut_token:
+    name: iOS Shortcut token
+    description: >-
+      Enables quick expense entry from the Shortcuts app (POST /api/shortcut/expense). Use a long random value.
+      Leave empty to disable.
+network:
+  3000/tcp: Port for the iOS Shortcut (optional)

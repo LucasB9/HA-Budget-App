@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+**/dist
+**/dist-types
+.data
+*.local.json
+*.db
+*.db-wal
+*.db-shm
+*.log
+.git

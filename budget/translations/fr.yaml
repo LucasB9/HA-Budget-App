@@ -1,0 +1,17 @@
+configuration:
+  anthropic_api_key:
+    name: Clé API Anthropic
+    description: >-
+      Sert uniquement au récap mensuel par IA. Reste dans la configuration de l'app (jamais dans le dépôt GitHub).
+      Laissez vide pour désactiver le récap.
+  anthropic_model:
+    name: Modèle Anthropic
+    description: >-
+      Modèle utilisé pour le récap. claude-opus-5-5 par défaut ; claude-sonnet-5-5 est moins cher.
+  shortcut_token:
+    name: Jeton du Raccourci iOS
+    description: >-
+      Active l'ajout rapide de dépenses depuis l'app Raccourcis (POST /api/shortcut/expense). Choisissez une longue
+      valeur aléatoire. Laissez vide pour désactiver.
+network:
+  3000/tcp: Port pour le Raccourci iOS (optionnel)

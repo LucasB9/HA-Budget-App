@@ -1,0 +1,40 @@
+name: Household Budget
+version: "0.1.0"
+slug: household_budget
+description: Budget de foyer partagé (dépenses à la Tricount, épargne, récap IA mensuel)
+url: https://github.com/CHANGE-ME/HA-Budget-App
+arch:
+  - aarch64
+  - amd64
+init: false
+startup: application
+boot: auto
+
+# Web UI inside Home Assistant (sidebar). The second person may not be an admin, so the panel must stay open to everyone.
+ingress: true
+ingress_port: 3000
+panel_icon: mdi:wallet
+panel_title: Budget
+panel_admin: false
+
+# Lets the app publish a few sensors (remaining budget, balance owed...) to Home Assistant.
+homeassistant_api: true
+
+# Restarts the app if it stops answering.
+watchdog: http://[HOST]:[PORT:3000]/api/health
+
+# Optional: expose the port for the iOS Shortcut endpoint. Disabled by default; enable it from the
+# app's Network settings. Everything except /api/shortcut/* still refuses non-Home-Assistant traffic.
+ports:
+  3000/tcp: null
+ports_description:
+  3000/tcp: Raccourci iOS (optionnel)
+
+options:
+  anthropic_api_key: ""
+  anthropic_model: claude-opus-5-5
+  shortcut_token: ""
+schema:
+  anthropic_api_key: password?
+  anthropic_model: str
+  shortcut_token: password?

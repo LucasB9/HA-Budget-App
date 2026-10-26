@@ -23,6 +23,8 @@ export function coreRoutes(app: FastifyInstance, ctx: AppContext): void {
       settings: getSettings(ctx.db),
       version: ctx.config.version,
       aiConfigured: ctx.config.anthropicApiKey !== null,
+      shortcutEnabled: ctx.config.shortcutToken !== null,
+      inHomeAssistant: ctx.config.supervisorToken !== null,
       today: today(ctx),
       currentMonth: thisMonth(ctx),
     };

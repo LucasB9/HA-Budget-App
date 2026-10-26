@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../lib/api';
 import { useApp } from '../lib/app-context';
 import { useAction } from '../lib/queries';
+import { DataTools } from '../components/DataTools';
 import { Field, Segmented } from '../components/ui';
 
 export function Settings(): JSX.Element {
@@ -92,6 +93,8 @@ export function Settings(): JSX.Element {
           />
         )}
       </div>
+
+      <DataTools />
 
       <p className="muted small" style={{ textAlign: 'center' }}>
         Budget {session.version}

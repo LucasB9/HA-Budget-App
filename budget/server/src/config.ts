@@ -37,6 +37,16 @@ function readHaOptions(): HaOptions {
   }
 }
 
+/** The app version lives in config.yaml (the file Home Assistant reads); the image ships a copy. */
+function readVersionFromConfigYaml(path: string): string | null {
+  try {
+    const match = /^version:\s*["']?([^"'\s#]+)["']?/m.exec(readFileSync(path, 'utf8'));
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function nonEmpty(value: string | undefined): string | null {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
@@ -57,6 +67,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     enforceIngress: env.INGRESS_ONLY === 'true' || (supervisorToken !== null && env.INGRESS_ONLY !== 'false'),
     supervisorToken,
     shortcutToken: nonEmpty(options.shortcut_token) ?? nonEmpty(env.SHORTCUT_TOKEN),
-    version: env.APP_VERSION ?? '0.0.0-dev',
+    version:
+      nonEmpty(env.APP_VERSION) ??
+      readVersionFromConfigYaml(env.CONFIG_YAML_PATH ?? resolve(process.cwd(), 'config.yaml')) ??
+      '0.0.0-dev',
   };
 }

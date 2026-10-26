@@ -1,16 +1,19 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import fastifyStatic from '@fastify/static';
-import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
+import Fastify, { LogController, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import type { AppContext } from './context.js';
+import type { HaPublisher } from './ha/publisher.js';
 import { registerErrorHandler } from './http.js';
 import { registerIngress } from './ingress.js';
 import { catalogRoutes } from './routes/catalog.js';
 import { coreRoutes } from './routes/core.js';
+import { dataRoutes } from './routes/data.js';
 import { expenseRoutes } from './routes/expenses.js';
 import { monthRoutes } from './routes/months.js';
 import { recapRoutes } from './routes/recaps.js';
 import { savingsRoutes } from './routes/savings.js';
+import { shortcutRoutes } from './routes/shortcut.js';
 
 /** Injects `<base href>` so relative asset URLs resolve under the ingress prefix, even without a trailing slash. */
 function renderIndex(html: string, ingressPath: string | null): string {
@@ -18,11 +21,26 @@ function renderIndex(html: string, ingressPath: string | null): string {
   return html.replace(/<head[^>]*>/, (head) => `${head}\n    <base href="${ingressPath}/" />`);
 }
 
-export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): FastifyInstance {
-  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 5 * 1024 * 1024 });
+export function buildApp(ctx: AppContext, opts: { logger?: boolean; haPublisher?: HaPublisher | null } = {}): FastifyInstance {
+  // Per-request logging is off: URLs can carry search text and the logs would be noisy for no benefit.
+  const app = Fastify({
+    logger: opts.logger ?? false,
+    logController: new LogController({ disableRequestLogging: true }),
+    bodyLimit: 5 * 1024 * 1024,
+  });
 
   registerErrorHandler(app);
   registerIngress(app, ctx);
+
+  const publisher = opts.haPublisher ?? null;
+  if (publisher) {
+    // Keep the Home Assistant sensors in step with every successful change.
+    app.addHook('onResponse', async (req, reply) => {
+      if (req.method !== 'GET' && req.method !== 'HEAD' && req.url.startsWith('/api/') && reply.statusCode < 400) {
+        publisher.schedule();
+      }
+    });
+  }
 
   coreRoutes(app, ctx);
   catalogRoutes(app, ctx);
@@ -30,6 +48,8 @@ export function buildApp(ctx: AppContext, opts: { logger?: boolean } = {}): Fast
   expenseRoutes(app, ctx);
   savingsRoutes(app, ctx);
   recapRoutes(app, ctx);
+  dataRoutes(app, ctx);
+  shortcutRoutes(app, ctx);
 
   const indexPath = join(ctx.config.webDir, 'index.html');
   if (existsSync(indexPath)) {

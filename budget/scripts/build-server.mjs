@@ -7,7 +7,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 await build({
   entryPoints: [resolve(root, 'server/src/index.ts')],
-  outfile: resolve(root, 'server/dist/server.js'),
+  outfile: resolve(root, 'server/dist/server.mjs'),
   bundle: true,
   platform: 'node',
   target: 'node22',

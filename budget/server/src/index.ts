@@ -3,6 +3,7 @@ import { buildApp } from './app.js';
 import { loadConfig } from './config.js';
 import type { AppContext } from './context.js';
 import { openDatabase } from './db/connection.js';
+import { createHaClient, createHaPublisher } from './ha/publisher.js';
 import { runDailyTasks } from './services/fixed.js';
 import { runAutoRecap } from './services/recap.js';
 
@@ -16,7 +17,17 @@ async function main(): Promise<void> {
     ai: config.anthropicApiKey ? createAnthropicClient(config.anthropicApiKey) : null,
     now: () => new Date(),
   };
-  const app = buildApp(ctx, { logger: true });
+  let warnedHa = false;
+  const haPublisher = config.supervisorToken
+    ? createHaPublisher(ctx, createHaClient(config.supervisorToken), {
+        onError: (err) => {
+          // One warning is enough: the most common cause is `homeassistant_api` being off.
+          if (!warnedHa) app.log.warn({ err }, 'could not publish sensors to Home Assistant');
+          warnedHa = true;
+        },
+      })
+    : null;
+  const app = buildApp(ctx, { logger: true, haPublisher });
 
   const housekeeping = (): void => {
     try {
@@ -25,6 +36,7 @@ async function main(): Promise<void> {
     } catch (err) {
       app.log.error({ err }, 'daily tasks failed');
     }
+    void haPublisher?.publishNow();
     runAutoRecap(ctx)
       .then((recap) => {
         if (recap) app.log.info({ month: recap.month }, 'monthly recap generated');
@@ -32,6 +44,7 @@ async function main(): Promise<void> {
       .catch((err: unknown) => app.log.warn({ err }, 'automatic recap failed'));
   };
   housekeeping();
+  void haPublisher?.publishNow();
   const timer = setInterval(housekeeping, HOUR_MS);
   timer.unref();
 

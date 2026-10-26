@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "WEB_DIR=../web/dist SEED_EXAMPLE_PATH=../seed.example.json DATA_DIR=../.data tsx watch --clear-screen=false src/index.ts",
+    "dev": "WEB_DIR=../web/dist SEED_EXAMPLE_PATH=../seed.example.json DATA_DIR=../.data CONFIG_YAML_PATH=../config.yaml tsx watch --clear-screen=false src/index.ts",
     "build": "node ../scripts/build-server.mjs"
   },
   "dependencies": {

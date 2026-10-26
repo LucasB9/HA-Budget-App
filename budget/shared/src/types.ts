@@ -22,6 +22,10 @@ export interface SessionDto {
   settings: Settings;
   version: string;
   aiConfigured: boolean;
+  /** True when the iOS Shortcut endpoint has a token configured. */
+  shortcutEnabled: boolean;
+  /** True when running as a Home Assistant app (sensors are published). */
+  inHomeAssistant: boolean;
   today: string;
   currentMonth: string;
 }
